@@ -1,0 +1,16 @@
+% Q
+q0
+q1
+q2
+% Sigma
+a
+b
+% F
+q2
+% Q0
+q0
+% Delta
+q0 a q0
+q0 b q0
+q0 a q1
+q1 b q2

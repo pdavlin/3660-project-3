@@ -4,15 +4,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import javax.naming.spi.DirStateFactory.Result;
 
 public class NFAConvert {
     private static String CLASS_NAME = NFAConvert.class.getSimpleName();
@@ -20,16 +15,12 @@ public class NFAConvert {
 
     private static Map<String, NFAState> nfaStateMachine = new HashMap<String, NFAState>();
     private static Map<String, DFAState> dfaStateMachine = new HashMap<String, DFAState>();
-
-    private static Boolean debugMode = false;
-
     private static String initState;
 
     public static void main(final String args[]) {
-        debugMode = (args.length == 2 && args[1].equals("debug"));
         if (args.length == 0) {
             // System.out.println(CLASS_NAME + ": no input files specified");
-            buildNFA("input.txt");
+            buildNFA("gfg.txt");
         } else {
             buildNFA(args[0]);
         }
@@ -99,15 +90,16 @@ public class NFAConvert {
             if (!possibleIncludedStates.contains(stateName))
                 possibleIncludedStates.add(stateName);
             List<NFAState> nfaList = nfaStateMachine.get(nfaStateName).getNextStates("E");
-            for (NFAState nfaNextState : nfaList) {
-                String nfaNextStateName = nfaNextState.getName();
-                if (!possibleIncludedStates.contains(nfaNextStateName))
-                    possibleIncludedStates.add(nfaNextStateName);
+            if (nfaList != null) {
+                for (NFAState nfaNextState : nfaList) {
+                    String nfaNextStateName = nfaNextState.getName();
+                    if (!possibleIncludedStates.contains(nfaNextStateName))
+                        possibleIncludedStates.add(nfaNextStateName);
+                }
             }
         }
 
         String dfaStateString = "";
-        List<NFAState> nfaList = nfaStateMachine.get(stateName).getNextStates("E");
         for (String state : possibleIncludedStates) {
             dfaStateString = dfaStateString.concat(state).concat(",");
         }
@@ -144,8 +136,7 @@ public class NFAConvert {
                 DFAState newDfaState = new DFAState();
                 newDfaState.setName(dfaStateName);
                 newDfaState.setAccepting(nfaProc.isAccepting());
-                dfaStateMachine.put(dfaStateName, newDfaState);
-                String debug = "debug";
+                dfaStateMachine.put(buildStateSetFromEmptyStringConnections(dfaStateName), newDfaState);
                 dfaStateMachine.get(baseStateName).setNextStates(inputString, newDfaState);
             } else {
                 dfaStateMachine.get(baseStateName).setNextStates(inputString, dfaStateMachine.get(dfaStateName));
