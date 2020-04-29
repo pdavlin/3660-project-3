@@ -12,9 +12,8 @@ S5
 S1
 S4
 % Q0
-S5
+S0
 % Delta 
-S5 E S0
 S0 E S1
 S0 E S3
 S1 0 S1
@@ -25,3 +24,4 @@ S3 0 S4
 S3 1 S3
 S4 0 S3
 S4 1 S4
+S4 E S5

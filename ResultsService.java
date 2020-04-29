@@ -31,8 +31,14 @@ public class ResultsService {
             final String stateNameFinal = stateName;
 
             inputAlphabet.forEach(inputString -> {
+                try {
                 String nextState = state.getNextStates(inputString).getName();
+
                 System.out.println(formatAsSet(stateNameFinal) + " " + inputString + " " + formatAsSet(nextState));
+                }
+                catch (NullPointerException npe) {
+                    
+                }
             });
         });
     }

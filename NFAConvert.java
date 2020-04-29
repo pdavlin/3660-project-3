@@ -19,8 +19,7 @@ public class NFAConvert {
 
     public static void main(final String args[]) {
         if (args.length == 0) {
-            // System.out.println(CLASS_NAME + ": no input files specified");
-            buildNFA("gfg.txt");
+            System.out.println(CLASS_NAME + ": no input files specified");
         } else {
             buildNFA(args[0]);
         }
@@ -85,16 +84,23 @@ public class NFAConvert {
 
     public static String buildStateSetFromEmptyStringConnections(String stateName) {
         List<String> possibleIncludedStates = new ArrayList<String>();
+        List<NFAState> nfaList = new ArrayList<NFAState>();
 
         for (String nfaStateName : stateName.split(",")) {
-            if (!possibleIncludedStates.contains(stateName))
+            if (!possibleIncludedStates.contains(stateName)) {
                 possibleIncludedStates.add(stateName);
-            List<NFAState> nfaList = nfaStateMachine.get(nfaStateName).getNextStates("E");
-            if (nfaList != null) {
-                for (NFAState nfaNextState : nfaList) {
-                    String nfaNextStateName = nfaNextState.getName();
-                    if (!possibleIncludedStates.contains(nfaNextStateName))
+            }
+            if (nfaStateMachine.get(nfaStateName).getNextStates("E") != null) {
+                nfaList.addAll(nfaStateMachine.get(nfaStateName).getNextStates("E"));
+                // for (NFAState nfaNextState : nfaList) {
+                while (nfaList.size() > 0) {
+                    String nfaNextStateName = nfaList.get(0).getName();
+                    if (!possibleIncludedStates.contains(nfaNextStateName)) {
                         possibleIncludedStates.add(nfaNextStateName);
+                        if (nfaStateMachine.get(nfaNextStateName).getNextStates("E") != null)
+                            nfaList.addAll(nfaStateMachine.get(nfaNextStateName).getNextStates("E"));
+                    }
+                    nfaList.remove(0);
                 }
             }
         }
@@ -131,15 +137,16 @@ public class NFAConvert {
                 dfaStateName = dfaStateName.concat(nfaState).concat(",");
             }
             dfaStateName = dfaStateName.substring(0, dfaStateName.length() - 1);
-
-            if (!dfaStateMachine.containsKey(dfaStateName)) {
+            String expandedStateSet = buildStateSetFromEmptyStringConnections(dfaStateName);
+            if (!dfaStateMachine.containsKey(expandedStateSet)) {
                 DFAState newDfaState = new DFAState();
-                newDfaState.setName(dfaStateName);
+                newDfaState.setName(expandedStateSet);
                 newDfaState.setAccepting(nfaProc.isAccepting());
-                dfaStateMachine.put(buildStateSetFromEmptyStringConnections(dfaStateName), newDfaState);
+                dfaStateMachine.put(expandedStateSet, newDfaState);
                 dfaStateMachine.get(baseStateName).setNextStates(inputString, newDfaState);
             } else {
-                dfaStateMachine.get(baseStateName).setNextStates(inputString, dfaStateMachine.get(dfaStateName));
+                dfaStateMachine.get(baseStateName).setNextStates(inputString, dfaStateMachine.get(expandedStateSet));
+
             }
         });
     }
