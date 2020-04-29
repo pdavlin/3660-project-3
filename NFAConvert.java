@@ -124,7 +124,6 @@ public class NFAConvert {
             addCheckedStatesToDfaStateMachine(checkedNfaStates, dfaBaseState.getName());
             dfaBaseState.setProcessed();
             dfaStateMachine.put(dfaBaseState.getName(), dfaBaseState);
-            String debug = "debug";
             buildDFA();
         }
     }
@@ -179,7 +178,6 @@ public class NFAConvert {
                         destinationNfaStates.put(inputCharacter,
                                 adjustNfaProcessor(nfaProcessor, nfaProcessorToDelete));
                     }
-                    // destinationNfaStates.put(inputCharacter, concatenatedDestinationStates);
                 }
             });
         });
