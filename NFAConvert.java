@@ -83,7 +83,7 @@ public class NFAConvert {
         initialDfaState.setInitial();
         // initialDfaState.setName(buildStateSetFromEmptyStringConnections(initState));
         String initialDfaStateName = buildStateSetFromEmptyStringConnections(initState);
-        for(String nfaStateName : initialDfaStateName.split(",")) {
+        for (String nfaStateName : initialDfaStateName.split(",")) {
             if (nfaStateMachine.get(nfaStateName).getAccepting()) {
                 initialDfaState.setAccepting(true);
             }
@@ -93,11 +93,25 @@ public class NFAConvert {
     }
 
     public static String buildStateSetFromEmptyStringConnections(String stateName) {
-        String dfaStateString = stateName.concat(",");
-        List<NFAState> nfaList = nfaStateMachine.get(stateName).getNextStates("E");
-        for (NFAState nfaState : nfaList) {
-            dfaStateString = dfaStateString.concat(nfaState.getName()).concat(",");
+        List<String> possibleIncludedStates = new ArrayList<String>();
+
+        for (String nfaStateName : stateName.split(",")) {
+            if (!possibleIncludedStates.contains(stateName))
+                possibleIncludedStates.add(stateName);
+            List<NFAState> nfaList = nfaStateMachine.get(nfaStateName).getNextStates("E");
+            for (NFAState nfaNextState : nfaList) {
+                String nfaNextStateName = nfaNextState.getName();
+                if (!possibleIncludedStates.contains(nfaNextStateName))
+                    possibleIncludedStates.add(nfaNextStateName);
+            }
         }
+
+        String dfaStateString = "";
+        List<NFAState> nfaList = nfaStateMachine.get(stateName).getNextStates("E");
+        for (String state : possibleIncludedStates) {
+            dfaStateString = dfaStateString.concat(state).concat(",");
+        }
+
         return dfaStateString.substring(0, dfaStateString.length() - 1);
     }
 
@@ -108,7 +122,7 @@ public class NFAConvert {
             System.exit(0);
         } else {
             List<String> nfaStatesToCheck = Arrays.asList(dfaBaseState.getName().split(","));
-            Map<String, NFAProcessor> checkedNfaStates =  checkNfaStates(nfaStatesToCheck);
+            Map<String, NFAProcessor> checkedNfaStates = checkNfaStates(nfaStatesToCheck);
             addCheckedStatesToDfaStateMachine(checkedNfaStates, dfaBaseState.getName());
             dfaBaseState.setProcessed();
             dfaStateMachine.put(dfaBaseState.getName(), dfaBaseState);
@@ -117,14 +131,15 @@ public class NFAConvert {
         }
     }
 
-    private static void addCheckedStatesToDfaStateMachine(Map<String, NFAProcessor> checkedNfaStates, String baseStateName) {
+    private static void addCheckedStatesToDfaStateMachine(Map<String, NFAProcessor> checkedNfaStates,
+            String baseStateName) {
         checkedNfaStates.forEach((inputString, nfaProc) -> {
             String dfaStateName = "";
-            for(String nfaState : nfaProc.getDestinationStateNames()) {
+            for (String nfaState : nfaProc.getDestinationStateNames()) {
                 dfaStateName = dfaStateName.concat(nfaState).concat(",");
             }
             dfaStateName = dfaStateName.substring(0, dfaStateName.length() - 1);
-            
+
             if (!dfaStateMachine.containsKey(dfaStateName)) {
                 DFAState newDfaState = new DFAState();
                 newDfaState.setName(dfaStateName);
