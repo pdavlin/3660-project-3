@@ -1,12 +1,9 @@
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 class DFAState {
-    // Map input string to list of next State Names
     private String stateName;
-    private final Map<String, DFAState> nextStates;
+    private final Map<String, DFAState> nextStates; // Map input string to list of next State Names
     private boolean accepting;
     private boolean initial;
     private boolean processed;
