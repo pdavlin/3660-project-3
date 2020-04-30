@@ -20,6 +20,7 @@ public class NFAConvert {
     public static void main(final String args[]) {
         if (args.length == 0) {
             System.out.println(CLASS_NAME + ": no input files specified");
+            System.exit(0);
         } else {
             buildNFA(args[0]);
         }
@@ -106,13 +107,7 @@ public class NFAConvert {
                 }
             }
         }
-
-        String dfaStateString = "";
-        for (String state : possibleIncludedStates) {
-            dfaStateString = dfaStateString.concat(state).concat(",");
-        }
-
-        return dfaStateString.substring(0, dfaStateString.length() - 1);
+        return possibleIncludedStates.stream().collect(Collectors.joining(","));
     }
 
     public static void buildDFA() {
