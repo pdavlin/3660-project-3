@@ -55,8 +55,12 @@ public class NFAConvert {
                             break;
                         case 5:
                             String[] deltaFields = line.split(" ");
-                            nfaStateMachine.get(deltaFields[0]).setNextStates(deltaFields[1],
-                                    nfaStateMachine.get(deltaFields[2]));
+                            if (deltaFields.length == 2) {
+                                nfaStateMachine.get(deltaFields[0]).setNextStates("E",
+                                        nfaStateMachine.get(deltaFields[1]));
+                            } else
+                                nfaStateMachine.get(deltaFields[0]).setNextStates(deltaFields[1],
+                                        nfaStateMachine.get(deltaFields[2]));
                             break;
                     }
                 }
@@ -71,7 +75,6 @@ public class NFAConvert {
     public static void initializeDfaStateMachine() {
         DFAState initialDfaState = new DFAState();
         initialDfaState.setInitial();
-        // initialDfaState.setName(buildStateSetFromEmptyStringConnections(initState));
         String initialDfaStateName = buildStateSetFromEmptyStringConnections(initState);
         for (String nfaStateName : initialDfaStateName.split(",")) {
             if (nfaStateMachine.get(nfaStateName).getAccepting()) {
@@ -92,7 +95,6 @@ public class NFAConvert {
             }
             if (nfaStateMachine.get(nfaStateName).getNextStates("E") != null) {
                 nfaList.addAll(nfaStateMachine.get(nfaStateName).getNextStates("E"));
-                // for (NFAState nfaNextState : nfaList) {
                 while (nfaList.size() > 0) {
                     String nfaNextStateName = nfaList.get(0).getName();
                     if (!possibleIncludedStates.contains(nfaNextStateName)) {

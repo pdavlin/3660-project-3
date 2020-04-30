@@ -22,9 +22,9 @@ public class ResultsService {
 
         System.out.println("% Delta");
         dfaStateMachine.values().stream().flatMap(state -> {
-            return inputAlphabet.stream().map(functionName -> {
-                String nextStateName = state.getNextStates(functionName).getName();
-                return formatAsSet(state.getName()) + " " + functionName + " " + formatAsSet(nextStateName);
+            return inputAlphabet.stream().map(inputString -> {
+                String nextStateName = state.getNextStates(inputString).getName();
+                return formatAsSet(state.getName()) + " " + inputString + " " + formatAsSet(nextStateName);
             }).sorted();
         }).sorted().forEach(System.out::println);
     }
