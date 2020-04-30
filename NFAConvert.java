@@ -111,7 +111,12 @@ public class NFAConvert {
     }
 
     public static void buildDFA() {
-        DFAState dfaBaseState = getDfaStateToProcess();
+        DFAState dfaBaseState = dfaStateMachine
+                                .values()
+                                .stream()
+                                .filter(DFAState::isUnProcessed)
+                                .findFirst()
+                                .orElse(null);
         if (dfaBaseState == null) {
             ResultsService.printResults(dfaStateMachine, inputAlphabet);
             System.exit(0);
@@ -128,11 +133,7 @@ public class NFAConvert {
     private static void addCheckedStatesToDfaStateMachine(Map<String, NFAProcessor> checkedNfaStates,
             String baseStateName) {
         checkedNfaStates.forEach((inputString, nfaProc) -> {
-            String dfaStateName = "";
-            for (String nfaState : nfaProc.getDestinationStateNames()) {
-                dfaStateName = dfaStateName.concat(nfaState).concat(",");
-            }
-            dfaStateName = dfaStateName.substring(0, dfaStateName.length() - 1);
+            String dfaStateName = nfaProc.getDestinationStateNames().stream().collect(Collectors.joining(","));
             String expandedStateSet = buildStateSetFromEmptyStringConnections(dfaStateName);
             if (!dfaStateMachine.containsKey(expandedStateSet)) {
                 DFAState newDfaState = new DFAState();
@@ -148,12 +149,7 @@ public class NFAConvert {
     }
 
     public static DFAState getDfaStateToProcess() {
-        for (String dfaStateName : dfaStateMachine.keySet()) {
-            if (!dfaStateMachine.get(dfaStateName).getProcessed()) {
-                return dfaStateMachine.get(dfaStateName);
-            }
-        }
-        return null;
+        return dfaStateMachine.values().stream().filter(DFAState::isUnProcessed).findFirst().orElse(null);
     }
 
     public static Map<String, NFAProcessor> checkNfaStates(List<String> nfaStatesToCheck) {

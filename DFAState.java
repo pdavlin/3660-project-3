@@ -49,7 +49,11 @@ class DFAState {
 	}
 
 	public boolean getProcessed() {
-		return processed;
+		return this.processed;
+    }
+
+    public boolean isUnProcessed() {
+        return !this.processed;
     }
     
     public void setProcessed() {
